@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <title>versao js puro</title>
+<body>
+
+<div id="dropzone" style="height: 200px; width: 200px; border: 1px solid black">
+    Arraste e solte sua imagem aqui, ou clique para selecionar a imagem
+    <input type="file" id="fileInput" style="display: none" />
+</div>
+<img id="preview" alt="Preview" style="display: none; height: 100%; width: 100%" />
+<button id="uploadButton">Enviar</button>
+
+<script>
+    var dropzone = document.getElementById('dropzone');
+    var fileInput = document.getElementById('fileInput');
+    var preview = document.getElementById('preview');
+    var uploadButton = document.getElementById('uploadButton');
+
+    var selectedFile;
+
+    dropzone.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    dropzone.addEventListener('dragover', function(event) {
+        event.preventDefault();
+    });
+
+    dropzone.addEventListener('drop', function(event) {
+        event.preventDefault();
+        selectedFile = event.dataTransfer.files[0];
+        previewFile(selectedFile);
+    });
+
+    fileInput.addEventListener('change', function(event) {
+        selectedFile = event.target.files[0];
+        previewFile(selectedFile);
+    });
+
+    uploadButton.addEventListener('click', function() {
+        if (selectedFile) {
+            uploadFile(selectedFile);
+        }
+    });
+
+    function previewFile(file) {
+        var objectUrl = URL.createObjectURL(file);
+        preview.src = objectUrl;
+        preview.style.display = 'block';
+    }
+
+    function uploadFile(file) {
+        var formData = new FormData();
+        formData.append('image', file);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://localhost:5000/upload', true);
+        xhr.send(formData);
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                console.log('Upload concluído');
+            } else {
+                console.error('Erro no upload');
+            }
+        };
+    }
+</script>
+
+</body>
+</html>
